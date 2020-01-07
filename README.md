@@ -7,4 +7,4 @@ A curated list of middleware examples for [limiter](https://github.com/ulule/lim
 * [Beego](https://github.com/ulule/limiter-examples/blob/master/beego/main.go)
 * [Chi](https://github.com/ulule/limiter-examples/tree/master/chi/main.go)
 * [Echo](https://github.com/ulule/limiter-examples/tree/master/echo/main.go)
-* [Phi](https://github.com/ulule/limiter-examples/tree/master/phi/main.go)
+* [fasthttp](https://github.com/ulule/limiter-examples/tree/master/fasthttp/main.go)

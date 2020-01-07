@@ -2,12 +2,11 @@ package main
 
 import (
 	"fmt"
-	basePhi "github.com/cj1128/phi"
 	"github.com/go-redis/redis"
 	"github.com/ulule/limiter/v3"
-	"github.com/ulule/limiter/v3/drivers/middleware/phi"
+	"github.com/ulule/limiter/v3/drivers/middleware/fasthttp"
 	sredis "github.com/ulule/limiter/v3/drivers/store/redis"
-	"github.com/valyala/fasthttp"
+	libFastHttp "github.com/valyala/fasthttp"
 	"log"
 )
 
@@ -37,16 +36,19 @@ func main() {
 		return
 	}
 
-	// Create a phi server
-	middleware := phi.NewMiddleware(limiter.New(store, rate, limiter.WithTrustForwardHeader(true)))
+	// Create a fasthttp server
+	middleware := fasthttp.NewMiddleware(limiter.New(store, rate, limiter.WithTrustForwardHeader(true)))
 
-	router := basePhi.NewRouter()
-	router.Use(middleware.Handler)
-	router.Get("/", func(ctx *fasthttp.RequestCtx) {
-		ctx.Response.Header.SetContentType("application/json")
-		ctx.Response.SetBodyString(`{"message": "ok"}`)
-		ctx.SetStatusCode(fasthttp.StatusOK)
-	})
+	requestHandler := func(ctx *libFastHttp.RequestCtx) {
+		switch string(ctx.Path()) {
+		case "/":
+			ctx.Response.Header.SetContentType("application/json")
+			ctx.Response.SetBodyString(`{"message": "ok"}`)
+			ctx.SetStatusCode(libFastHttp.StatusOK)
+			break
+		}
+	}
+
 	fmt.Println("Server is running on port 7777")
-	log.Fatal(fasthttp.ListenAndServe(":7777", router.ServeFastHTTP))
+	log.Fatal(libFastHttp.ListenAndServe(":7777", middleware.Handle(requestHandler)))
 }
