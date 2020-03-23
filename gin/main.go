@@ -4,9 +4,10 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/gin-gonic/gin"
-	"github.com/go-redis/redis"
-	"github.com/ulule/limiter/v3"
+	libgin "github.com/gin-gonic/gin"
+	libredis "github.com/go-redis/redis/v7"
+
+	limiter "github.com/ulule/limiter/v3"
 	mgin "github.com/ulule/limiter/v3/drivers/middleware/gin"
 	sredis "github.com/ulule/limiter/v3/drivers/store/redis"
 )
@@ -21,12 +22,12 @@ func main() {
 	}
 
 	// Create a redis client.
-	option, err := redis.ParseURL("redis://localhost:6379/0")
+	option, err := libredis.ParseURL("redis://localhost:6379/0")
 	if err != nil {
 		log.Fatal(err)
 		return
 	}
-	client := redis.NewClient(option)
+	client := libredis.NewClient(option)
 
 	// Create a store with the redis client.
 	store, err := sredis.NewStoreWithOptions(client, limiter.StoreOptions{
@@ -42,14 +43,14 @@ func main() {
 	middleware := mgin.NewMiddleware(limiter.New(store, rate))
 
 	// Launch a simple server.
-	router := gin.Default()
+	router := libgin.Default()
 	router.ForwardedByClientIP = true
 	router.Use(middleware)
 	router.GET("/", index)
 	log.Fatal(router.Run(":7777"))
 }
 
-func index(c *gin.Context) {
+func index(c *libgin.Context) {
 	type message struct {
 		Message string `json:"message"`
 	}
