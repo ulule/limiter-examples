@@ -5,9 +5,10 @@ import (
 	"log"
 	"net/http"
 
-	redis "github.com/go-redis/redis"
-	"github.com/ulule/limiter/v3"
-	"github.com/ulule/limiter/v3/drivers/middleware/stdlib"
+	libredis "github.com/go-redis/redis/v7"
+
+	limiter "github.com/ulule/limiter/v3"
+	mhttp "github.com/ulule/limiter/v3/drivers/middleware/stdlib"
 	sredis "github.com/ulule/limiter/v3/drivers/store/redis"
 )
 
@@ -21,12 +22,12 @@ func main() {
 	}
 
 	// Create a redis client.
-	option, err := redis.ParseURL("redis://localhost:6379/0")
+	option, err := libredis.ParseURL("redis://localhost:6379/0")
 	if err != nil {
 		log.Fatal(err)
 		return
 	}
-	client := redis.NewClient(option)
+	client := libredis.NewClient(option)
 
 	// Create a store with the redis client.
 	store, err := sredis.NewStoreWithOptions(client, limiter.StoreOptions{
@@ -39,7 +40,7 @@ func main() {
 	}
 
 	// Create a new middleware with the limiter instance.
-	middleware := stdlib.NewMiddleware(limiter.New(store, rate, limiter.WithTrustForwardHeader(true)))
+	middleware := mhttp.NewMiddleware(limiter.New(store, rate, limiter.WithTrustForwardHeader(true)))
 
 	// Launch a simple server.
 	http.Handle("/", middleware.Handler(http.HandlerFunc(index)))
@@ -50,5 +51,8 @@ func main() {
 
 func index(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	w.Write([]byte(`{"message": "ok"}`))
+	_, err := w.Write([]byte(`{"message": "ok"}`))
+	if err != nil {
+		log.Fatal(err)
+	}
 }
