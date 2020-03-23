@@ -2,29 +2,31 @@ package main
 
 import (
 	"fmt"
-	"github.com/go-redis/redis"
-	"github.com/ulule/limiter/v3"
-	"github.com/ulule/limiter/v3/drivers/middleware/fasthttp"
-	sredis "github.com/ulule/limiter/v3/drivers/store/redis"
-	libFastHttp "github.com/valyala/fasthttp"
 	"log"
+
+	libredis "github.com/go-redis/redis/v7"
+	libfasthttp "github.com/valyala/fasthttp"
+
+	limiter "github.com/ulule/limiter/v3"
+	mfasthttp "github.com/ulule/limiter/v3/drivers/middleware/fasthttp"
+	sredis "github.com/ulule/limiter/v3/drivers/store/redis"
 )
 
 func main() {
-	// Define a limit rate to 4 requests per second
-	rate, err := limiter.NewRateFromFormatted("4-S")
+	// Define a limit rate to 4 requests per minute.
+	rate, err := limiter.NewRateFromFormatted("4-H")
 	if err != nil {
 		log.Fatal(err)
 		return
 	}
 
-	// Create redis client
-	option, err := redis.ParseURL("redis://localhost:6379/0")
+	// Create redis client.
+	option, err := libredis.ParseURL("redis://localhost:6379/0")
 	if err != nil {
 		log.Fatal(err)
 		return
 	}
-	client := redis.NewClient(option)
+	client := libredis.NewClient(option)
 
 	// Create a store with the redis client.
 	store, err := sredis.NewStoreWithOptions(client, limiter.StoreOptions{
@@ -36,19 +38,24 @@ func main() {
 		return
 	}
 
-	// Create a fasthttp server
-	middleware := fasthttp.NewMiddleware(limiter.New(store, rate, limiter.WithTrustForwardHeader(true)))
+	// Create a fasthttp middleware.
+	middleware := mfasthttp.NewMiddleware(limiter.New(store, rate, limiter.WithTrustForwardHeader(true)))
 
-	requestHandler := func(ctx *libFastHttp.RequestCtx) {
+	// Create a fasthttp request handler.
+	handler := func(ctx *libfasthttp.RequestCtx) {
 		switch string(ctx.Path()) {
 		case "/":
 			ctx.Response.Header.SetContentType("application/json")
 			ctx.Response.SetBodyString(`{"message": "ok"}`)
-			ctx.SetStatusCode(libFastHttp.StatusOK)
-			break
+			ctx.SetStatusCode(libfasthttp.StatusOK)
+		default:
+			ctx.Response.Header.SetContentType("application/json")
+			ctx.Response.SetBodyString(`{"message": "object-not-found"}`)
+			ctx.SetStatusCode(libfasthttp.StatusNotFound)
 		}
 	}
 
+	// Launch fasthttp server.
 	fmt.Println("Server is running on port 7777")
-	log.Fatal(libFastHttp.ListenAndServe(":7777", middleware.Handle(requestHandler)))
+	log.Fatal(libfasthttp.ListenAndServe(":7777", middleware.Handle(handler)))
 }
