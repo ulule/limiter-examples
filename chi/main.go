@@ -6,7 +6,7 @@ import (
 	"net/http"
 
 	libchi "github.com/go-chi/chi"
-	libredis "github.com/go-redis/redis/v7"
+	libredis "github.com/go-redis/redis/v8"
 
 	limiter "github.com/ulule/limiter/v3"
 	mhttp "github.com/ulule/limiter/v3/drivers/middleware/stdlib"

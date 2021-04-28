@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 
-	libredis "github.com/go-redis/redis/v7"
+	libredis "github.com/go-redis/redis/v8"
 	libfasthttp "github.com/valyala/fasthttp"
 
 	limiter "github.com/ulule/limiter/v3"

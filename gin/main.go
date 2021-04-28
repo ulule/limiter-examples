@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	libgin "github.com/gin-gonic/gin"
-	libredis "github.com/go-redis/redis/v7"
+	libredis "github.com/go-redis/redis/v8"
 
 	limiter "github.com/ulule/limiter/v3"
 	mgin "github.com/ulule/limiter/v3/drivers/middleware/gin"
