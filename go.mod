@@ -12,6 +12,6 @@ require (
 	github.com/mattn/go-colorable v0.1.6 // indirect
 	github.com/shiena/ansicolor v0.0.0-20151119151921-a422bbe96644 // indirect
 	github.com/ulule/limiter/v3 v3.8.0
-	github.com/valyala/fasthttp v1.23.0
+	github.com/valyala/fasthttp v1.34.0
 	github.com/valyala/fasttemplate v1.1.0 // indirect
 )
