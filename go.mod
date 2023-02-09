@@ -4,7 +4,7 @@ go 1.12
 
 require (
 	github.com/astaxie/beego v1.12.1
-	github.com/gin-gonic/gin v1.6.3
+	github.com/gin-gonic/gin v1.7.7
 	github.com/go-chi/chi v4.0.3+incompatible
 	github.com/go-redis/redis/v8 v8.8.2
 	github.com/labstack/echo v3.3.10+incompatible
