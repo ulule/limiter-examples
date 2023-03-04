@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/labstack/echo"
-	"github.com/ulule/limiter/v3"
 	"github.com/ulule/limiter/v3/drivers/store/memory"
 )
 
@@ -33,8 +32,8 @@ func IPRateLimit() echo.MiddlewareFunc {
 		Period: 2 * time.Second,
 		Limit:  1,
 	}
-	store = memory.NewStore()
-	ipRateLimiter = limiter.New(store, rate)
+	store := memory.NewStore()
+	ipRateLimiter := limiter.New(store, rate)
 
 	// 2. Return middleware handler
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
