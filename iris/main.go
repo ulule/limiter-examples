@@ -1,13 +1,8 @@
-/*
-This example shows how to use the limiter middleware with the Iris web framework.
-Iris web framework docs: https://docs.iris-go.com/iris
-By: Saif Aljanahi
-https://github.com/1saifj
- */
-
 package main
 
 import (
+	"github.com/kataras/iris/v12"
+	"github.com/ulule/limiter/v3"
 	"github.com/ulule/limiter/v3/drivers/store/memory"
 	"log"
 	"net/http"
@@ -17,7 +12,7 @@ import (
 
 func main() {
 	app := iris.New()
-	app.Get("/hello", IPRateLimit(), hello) // 3. Use middleware
+	app.Get("/hello", IPRateLimit(), test) // 3. Use middleware
 	app.Run(iris.Addr(":8080"))
 }
 
