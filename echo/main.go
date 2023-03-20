@@ -2,13 +2,13 @@ package main
 
 import (
 	"fmt"
+	"github.com/labstack/echo"
+	"github.com/ulule/limiter/v3"
+	"github.com/ulule/limiter/v3/drivers/store/memory"
 	"log"
 	"net/http"
 	"strconv"
 	"time"
-
-	"github.com/labstack/echo"
-	"github.com/ulule/limiter/v3/drivers/store/memory"
 )
 
 var (
