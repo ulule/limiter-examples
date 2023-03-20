@@ -1,29 +1,17 @@
-/*
-This example shows how to use the limiter middleware with the Iris web framework.
-Iris web framework docs: https://docs.iris-go.com/iris
-By: Saif Aljanahi
-https://github.com/1saifj
-*/
-
 package main
 
 import (
+	"github.com/gofiber/fiber/v2"
+	"github.com/ulule/limiter/v3"
+	"github.com/ulule/limiter/v3/drivers/store/memory"
 	"log"
 	"strconv"
 	"time"
-
-	"github.com/gofiber/fiber/v2/middleware/logger"
-	"github.com/gofiber/fiber/v2/utils"
-	"github.com/ulule/limiter/v3/drivers/store/memory"
 )
 
 func main() {
 	app := fiber.New()
-	app.Use(recover.New())
-	app.Use(logger.New())
-
 	app.Get("/hello", IPRateLimit(), hello)
-
 	app.Listen(":8080")
 }
 
@@ -38,16 +26,12 @@ func IPRateLimit() fiber.Handler {
 		Limit:  1,
 	}
 	store := memory.NewStore()
-	ipRateLimiter := limiter.New(ipRateLimiterConfig{
-		Store:        store,
-		Rate:         rate,
-		KeyGenerator: func(c *fiber.Ctx) string { return utils.GetIP(c.IP()) },
-	})
+	ipRateLimiter := limiter.New(store, rate)
 
 	// 2. Return middleware handler
 	return func(c *fiber.Ctx) error {
 		ctx := c.Context()
-		limiterCtx, err := ipRateLimiter.Get(ctx, utils.GetIP(c.IP()))
+		limiterCtx, err := ipRateLimiter.Get(ctx, c.IP())
 		if err != nil {
 			log.Printf("IPRateLimit - ipRateLimiter.Get - err: %v, %s on %s", err, c.IP(), c.Path())
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
